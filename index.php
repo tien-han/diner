@@ -25,7 +25,6 @@
 
     //Breakfast menu route
     $f3-> route('GET /menus/breakfast', function() {
-        //echo '<h1>My Breakfast Menu</h1>';
         //Render a view page
         $view = new Template();
         echo $view->render('views/breakfast-menu.html');
@@ -43,6 +42,20 @@
         //Render a view page
         $view = new Template();
         echo $view->render('views/dinner-menu.html');
+    });
+
+    //Order Form Part I route
+    $f3-> route('GET /order1', function() {
+        //Render a view page
+        $view = new Template();
+        echo $view->render('views/order1.html');
+    });
+
+    //Order Form Part II route
+    $f3-> route('GET /order2', function() {
+        //Render a view page
+        $view = new Template();
+        echo $view->render('views/order2.html');
     });
 
     //Run Fat-Free
