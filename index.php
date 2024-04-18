@@ -59,12 +59,21 @@
 
             //Get the data from the post array
             $food = $_POST['food'];
-            $meal = $_POST["meal"];
+            $meal = $_POST['meal'];
 
             //If the data is valid
+//            if (!empty($food) && !empty($meal)) {
             if (true) {
+
+                //Add the data to the session array
                 $f3->set('SESSION.food', $food);
                 $f3->set('SESSION.meal', $meal);
+
+                //Send the user to the next form
+                $f3->reroute('order2');
+            } else {
+                //TODO: This is temporary; move it into a Views file
+                echo "<p>Validation errors</p>";
             }
         } else {
             echo "<p>You got here using the GET method!</p>";
@@ -76,7 +85,9 @@
     });
 
     //Order Form Part II route
-    $f3-> route('GET /order2', function() {
+    $f3-> route('GET /order2', function($f3) {
+        var_dump($f3->get('SESSION'));
+
         //Render a view page
         $view = new Template();
         echo $view->render('views/order2.html');
