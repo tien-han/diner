@@ -45,7 +45,31 @@
     });
 
     //Order Form Part I route
-    $f3-> route('GET /order1', function() {
+    //PHP doesn't look for global variables unless you tell it to, so we have to pass in $f3
+    $f3-> route('GET|POST /order1', function($f3) {
+        //If the form has been posted
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+//            echo "<p>You got here using the POST method!</p>";
+//            var_dump($_POST);
+
+            //If you don't want to pass in $f3 as an argument, you can:
+            global $f3;
+            //OR
+            $f3 = $GLOBALS['f3'];
+
+            //Get the data from the post array
+            $food = $_POST['food'];
+            $meal = $_POST["meal"];
+
+            //If the data is valid
+            if (true) {
+                $f3->set('SESSION.food', $food);
+                $f3->set('SESSION.meal', $meal);
+            }
+        } else {
+            echo "<p>You got here using the GET method!</p>";
+        }
+
         //Render a view page
         $view = new Template();
         echo $view->render('views/order1.html');
