@@ -85,12 +85,44 @@
     });
 
     //Order Form Part II route
-    $f3-> route('GET /order2', function($f3) {
+    $f3-> route('GET|POST /order2', function($f3) {
         var_dump($f3->get('SESSION'));
+
+        if ($_SERVER['REQUEST_METHOD'] == "POST") {
+            var_dump($_POST);
+            if (isset($_POST['conds'])) {
+                $condiments = implode(", ", $_POST['conds']);
+            } else {
+                $condiments = "None selected";
+            }
+
+            if (true) {
+
+                //Add the data to the session array
+                $f3->set('SESSION.condiments', $condiments);
+
+                //Send the user to the next form
+                $f3->reroute('summary');
+            } else {
+                //TODO: This is temporary; move it into a Views file
+                echo "<p>Validation errors</p>";
+            }
+        } else {
+            echo "<p>You got here using the GET method!</p>";
+        }
 
         //Render a view page
         $view = new Template();
         echo $view->render('views/order2.html');
+    });
+
+    //Order Summary route
+    $f3-> route('GET /summary', function($f3) {
+        var_dump($f3->get('SESSION'));
+
+        //Render a view page
+        $view = new Template();
+        echo $view->render('views/order-summary.html');
     });
 
     //Run Fat-Free
