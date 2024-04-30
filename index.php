@@ -12,6 +12,7 @@
 
     //Require the autoload file
     require_once('vendor/autoload.php');
+    require_once('model/data-layer.php');
 
     //Instantiate the F3 Base class (Fat-Free)
     $f3 = Base::instance();
@@ -59,7 +60,12 @@
 
             //Get the data from the post array
             $food = $_POST['food'];
-            $meal = $_POST['meal'];
+
+            if (isset($_POST['meal'])) {
+                $meal = $_POST['meal'];
+            } else {
+                $meal = "Lunch";
+            }
 
             //If the data is valid
 //            if (!empty($food) && !empty($meal)) {
@@ -72,12 +78,17 @@
                 //Send the user to the next form
                 $f3->reroute('order2');
             } else {
-                //TODO: This is temporary; move it into a Views file
+                //TODO: This is temporary; move it into a views file
                 echo "<p>Validation errors</p>";
             }
         } else {
             echo "<p>You got here using the GET method!</p>";
         }
+
+        //Get the data from the model
+        //and add it to the F3 hive so that it's visible in page
+        $meals = getMeals();
+        $f3->set('meals', $meals);
 
         //Render a view page
         $view = new Template();
@@ -87,6 +98,13 @@
     //Order Form Part II route
     $f3-> route('GET|POST /order2', function($f3) {
         var_dump($f3->get('SESSION'));
+
+        //Get the data from the model
+        //and add it to the F3 hive so that it's visible in page
+        $allCondiments = getCondiments();
+        var_dump($allCondiments);
+        $f3->set('condiments', $allCondiments);
+
 
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
             var_dump($_POST);
@@ -104,7 +122,7 @@
                 //Send the user to the next form
                 $f3->reroute('summary');
             } else {
-                //TODO: This is temporary; move it into a Views file
+                //TODO: This is temporary; move it into a views file
                 echo "<p>Validation errors</p>";
             }
         } else {
