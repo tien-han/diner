@@ -11,14 +11,13 @@
     error_reporting(E_ALL);
 
     //Require the autoload file
+    //If added something new to autoload file, type 'composer update' in root directory
     require_once('vendor/autoload.php');
-    require_once('model/data-layer.php');
-    require_once('model/validate.php');
 
     $testFood = 'pho';
 //    echo validFood($testFood) ? "valid" : "not valid";
     $testfood = '    xy     ';
-    echo validFood($testFood);
+    //echo validFood($testFood);
 
     //Instantiate the F3 Base class (Fat-Free)
     $f3 = Base::instance();
@@ -60,10 +59,7 @@
 
         //If the form has been posted
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
-//            echo "<p>You got here using the POST method!</p>";
-//            var_dump($_POST);
-
-            if (validFood($_POST['food'])) {
+            if (Validate::validFood($_POST['food'])) {
                 $food = $_POST['food'];
             } else {
                 $f3->set('errors["food"]', 'Please enter a food');
@@ -75,7 +71,7 @@
 //            $f3 = $GLOBALS['f3'];
 
             //Get the data from the post array
-            if (isset($_POST['meal']) and validMeal($_POST['meal'])) {
+            if (isset($_POST['meal']) and Validate::validMeal($_POST['meal'])) {
                 $meal = $_POST['meal'];
             } else {
                 $f3->set('errors["meal"]', 'Please select a meal');
@@ -84,20 +80,18 @@
             //If the data is valid
             // if (!empty($food) && !empty($meal)) {
             //Add the data to the session array
-            $f3->set('SESSION.food', $food);
-            $f3->set('SESSION.meal', $meal);
+            $order = new Order($food, $meal);
+            $f3->set('SESSION.order', $order);
 
             if(empty($f3->get('errors'))) {
                 //Send the user to the next form
                 $f3->reroute('order2');
             }
-        } else {
-            echo "<p>You got here using the GET method!</p>";
         }
 
         //Get the data from the model
         //and add it to the F3 hive so that it's visible in page
-        $meals = getMeals();
+        $meals = DataLayer::getMeals();
         $f3->set('meals', $meals);
 
         //Render a view page
@@ -115,9 +109,8 @@
             }
 
             if (true) {
-
                 //Add the data to the session array
-                $f3->set('SESSION.condiments', $condiments);
+                $f3->get('SESSION.order')->setCondiments($condiments);
 
                 //Send the user to the next form
                 $f3->reroute('summary');
@@ -131,7 +124,7 @@
 
         //Get the data from the model
         //and add it to the F3 hive so that it's visible in page
-        $condiments = getCondiments();
+        $condiments = DataLayer::getCondiments();
         $f3->set('condiments', $condiments);
 
         //Render a view page
@@ -141,11 +134,15 @@
 
     //Order Summary route
     $f3-> route('GET /summary', function($f3) {
+        //Write data to database (next week)
+
         var_dump($f3->get('SESSION'));
 
         //Render a view page
         $view = new Template();
         echo $view->render('views/order-summary.html');
+
+        session_destroy();
     });
 
     //Run Fat-Free
