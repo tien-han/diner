@@ -11,5 +11,5 @@ function getMeals() {
 
 //Get the condiments for the Diner app
 function getCondiments() {
-    return array('ketchup', 'mustard', 'sriracha');
+    return array('ketchup', 'mustard', 'sriracha', 'mayonnaise');
 }

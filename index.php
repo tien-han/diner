@@ -13,6 +13,12 @@
     //Require the autoload file
     require_once('vendor/autoload.php');
     require_once('model/data-layer.php');
+    require_once('model/validate.php');
+
+    $testFood = 'pho';
+//    echo validFood($testFood) ? "valid" : "not valid";
+    $testfood = '    xy     ';
+    echo validFood($testFood);
 
     //Instantiate the F3 Base class (Fat-Free)
     $f3 = Base::instance();
@@ -48,38 +54,42 @@
     //Order Form Part I route
     //PHP doesn't look for global variables unless you tell it to, so we have to pass in $f3
     $f3-> route('GET|POST /order1', function($f3) {
+        //Initialize variables
+        $food = '';
+        $meal = '';
+
         //If the form has been posted
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
 //            echo "<p>You got here using the POST method!</p>";
 //            var_dump($_POST);
 
+            if (validFood($_POST['food'])) {
+                $food = $_POST['food'];
+            } else {
+                $f3->set('errors["food"]', 'Please enter a food');
+            }
+
             //If you don't want to pass in $f3 as an argument, you can:
-            global $f3;
-            //OR
-            $f3 = $GLOBALS['f3'];
+//            global $f3;
+//            //OR
+//            $f3 = $GLOBALS['f3'];
 
             //Get the data from the post array
-            $food = $_POST['food'];
-
-            if (isset($_POST['meal'])) {
+            if (isset($_POST['meal']) and validMeal($_POST['meal'])) {
                 $meal = $_POST['meal'];
             } else {
-                $meal = "Lunch";
+                $f3->set('errors["meal"]', 'Please select a meal');
             }
 
             //If the data is valid
-//            if (!empty($food) && !empty($meal)) {
-            if (true) {
+            // if (!empty($food) && !empty($meal)) {
+            //Add the data to the session array
+            $f3->set('SESSION.food', $food);
+            $f3->set('SESSION.meal', $meal);
 
-                //Add the data to the session array
-                $f3->set('SESSION.food', $food);
-                $f3->set('SESSION.meal', $meal);
-
+            if(empty($f3->get('errors'))) {
                 //Send the user to the next form
                 $f3->reroute('order2');
-            } else {
-                //TODO: This is temporary; move it into a views file
-                echo "<p>Validation errors</p>";
             }
         } else {
             echo "<p>You got here using the GET method!</p>";
@@ -97,17 +107,7 @@
 
     //Order Form Part II route
     $f3-> route('GET|POST /order2', function($f3) {
-        var_dump($f3->get('SESSION'));
-
-        //Get the data from the model
-        //and add it to the F3 hive so that it's visible in page
-        $allCondiments = getCondiments();
-        var_dump($allCondiments);
-        $f3->set('condiments', $allCondiments);
-
-
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            var_dump($_POST);
             if (isset($_POST['conds'])) {
                 $condiments = implode(", ", $_POST['conds']);
             } else {
@@ -128,6 +128,11 @@
         } else {
             echo "<p>You got here using the GET method!</p>";
         }
+
+        //Get the data from the model
+        //and add it to the F3 hive so that it's visible in page
+        $condiments = getCondiments();
+        $f3->set('condiments', $condiments);
 
         //Render a view page
         $view = new Template();
