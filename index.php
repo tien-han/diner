@@ -14,89 +14,40 @@
     //If added something new to autoload file, type 'composer update' in root directory
     require_once('vendor/autoload.php');
 
-    $testFood = 'pho';
-//    echo validFood($testFood) ? "valid" : "not valid";
-    $testfood = '    xy     ';
-    //echo validFood($testFood);
-
     //Instantiate the F3 Base class (Fat-Free)
     $f3 = Base::instance();
+    $con = new Controller($f3);
 
     //Define a default route
     $f3-> route('GET /', function() {
-        //Render a view page
-        $view = new Template();
-        echo $view->render('views/home-page.html');
+        $GLOBALS['con']->home();
     });
 
     //Breakfast menu route
     $f3-> route('GET /menus/breakfast', function() {
         //Render a view page
-        $view = new Template();
-        echo $view->render('views/breakfast-menu.html');
+        $GLOBALS['con']->breakfast();
     });
 
     //Lunch menu route
     $f3-> route('GET /menus/lunch', function() {
         //Render a view page
-        $view = new Template();
-        echo $view->render('views/lunch-menu.html');
+        $GLOBALS['con']->lunch();
     });
 
     //Dinner menu route
     $f3-> route('GET /menus/dinner', function() {
-        //Render a view page
-        $view = new Template();
-        echo $view->render('views/dinner-menu.html');
+        $GLOBALS['con']->dinner();
     });
 
     //Order Form Part I route
     //PHP doesn't look for global variables unless you tell it to, so we have to pass in $f3
     $f3-> route('GET|POST /order1', function($f3) {
-        //Initialize variables
-        $food = '';
-        $meal = '';
-
-        //If the form has been posted
-        if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            if (Validate::validFood($_POST['food'])) {
-                $food = $_POST['food'];
-            } else {
-                $f3->set('errors["food"]', 'Please enter a food');
-            }
-
-            //If you don't want to pass in $f3 as an argument, you can:
-//            global $f3;
-//            //OR
-//            $f3 = $GLOBALS['f3'];
-
-            //Get the data from the post array
-            if (isset($_POST['meal']) and Validate::validMeal($_POST['meal'])) {
-                $meal = $_POST['meal'];
-            } else {
-                $f3->set('errors["meal"]', 'Please select a meal');
-            }
-
-            //If the data is valid
-            // if (!empty($food) && !empty($meal)) {
-            //Add the data to the session array
-            $order = new Order($food, $meal);
-            $f3->set('SESSION.order', $order);
-
-            if(empty($f3->get('errors'))) {
-                //Send the user to the next form
-                $f3->reroute('order2');
-            }
-        }
-
-        //Get the data from the model
-        //and add it to the F3 hive so that it's visible in page
-        $meals = DataLayer::getMeals();
-        $f3->set('meals', $meals);
-
-        //Render a view page
-        $view = new Template();
-        echo $view->render('views/order1.html');
+        //If you don't want to pass in $f3 as an argument, you can:
+            //global $f3;
+            //OR
+            //$f3 = $GLOBALS['f3'];
+        $GLOBALS['con']->order1();
     });
 
     //Order Form Part II route
