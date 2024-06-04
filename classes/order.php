@@ -4,9 +4,9 @@
     //In PHP, curly braces must be on the next line for classes
     class Order
     {
-        private $_food;
-        private $_meal;
-        private $_condiments;
+        private string $_food;
+        private string $_meal;
+        private string $_condiments;
 
         //You can't have overload constructors in PHP
         /**

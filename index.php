@@ -17,6 +17,12 @@
     //Instantiate the F3 Base class (Fat-Free)
     $f3 = Base::instance();
     $con = new Controller($f3);
+    $dataLayer = new DataLayer();
+
+    ////Testing
+    //$myOrder = new Order('breakfast', 'pancakes', 'maple syrup');
+    //$id = $dataLayer->saveOrder($myOrder);
+    //echo "Order $id inserted successfully!";
 
     //Define a default route
     $f3-> route('GET /', function() {
@@ -84,16 +90,8 @@
     });
 
     //Order Summary route
-    $f3-> route('GET /summary', function($f3) {
-        //Write data to database (next week)
-
-        var_dump($f3->get('SESSION'));
-
-        //Render a view page
-        $view = new Template();
-        echo $view->render('views/order-summary.html');
-
-        session_destroy();
+    $f3-> route('GET /summary', function() {
+        $GLOBALS['con']->summary();
     });
 
     //Run Fat-Free

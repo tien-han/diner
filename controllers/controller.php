@@ -1,7 +1,7 @@
 <?php
 
     /**
-     * My Controller class for the Diner project
+     * My controller class for the Diner project
      * 328/diner/controllers/controller.php
      */
     class Controller
@@ -84,6 +84,22 @@
             echo $view->render('views/order1.html');
         }
 
+        /**
+         * @return void
+         */
+        function summary() : void
+        {
+            //Write data to database (next week)
+            $order = $this->_f3->get('SESSION.order');
+            $id = $GLOBALS['dataLayer']->saveOrder($order);
+            echo "Order $id inserted successfully!";
+            //1. Add ID to F3 hive
+            $this->_f3->set('id', $id);
 
+            //Render a view page
+            $view = new Template();
+            echo $view->render('views/order-summary.html');
 
+            session_destroy();
+        }
     }
